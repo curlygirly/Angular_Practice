@@ -2,22 +2,13 @@ describe('GitUserSearchController', function(){
   beforeEach(module('GitUserSearch'));
 
   var ctrl;
-  var fakeSearch;
+  lconsole.log('You are begining to annoy me!!')
+  var items = helperMethod();
 
-  //  beforeEach(function(){
-  //   module(function ($provide) {
-  //     $provide.value('Search', fakeSearch);
-  //   });
-  // });
-
-   beforeEach(inject(function($q){
-
-   }));
 
   beforeEach(inject(function($controller){
     ctrl = $controller('GitUserSearchController');
   }));
-
 
   it('initialises with an empty search result and term', function(){
     expect(ctrl.searchResult).toBeUndefined();
@@ -26,10 +17,25 @@ describe('GitUserSearchController', function(){
     });
 
   describe('when searching for a user', function(){
+       var httpBackend;
+    beforeEach(inject(function($httpBackend){
+    httpBackend = $httpBackend
+    httpBackend
+        .expectGET("https://api.github.com/search/users?q=hello")
+        .respond(
+          { items: items }
+          );
+    }));
+
+    afterEach(function(){
+      httpBackend.verifyNoOutstandingExpectation();
+      httpBackend.verifyNoOutstandingRequest();
+    });
 
     it('displays search results', function(){
       ctrl.searchTerm = 'hello';
       ctrl.doSearch();
+      httpBackend.flush();
       expect(ctrl.searchResult.items).toEqual(items);
     });
   });
